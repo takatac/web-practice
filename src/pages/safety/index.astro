@@ -1,5 +1,28 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Faq from "../../components/Faq.astro";
+import Gallery from "../../components/Gallery.astro";
+
+const faqItems = [
+  {
+    question: "現場を見てもらうだけでも相談できますか？",
+    answer: "はい。製品が決まっていない段階でも、現場の困りごとを聞くところから始めます。",
+  },
+  {
+    question: "小さな現場でも対応してもらえますか？",
+    answer: "はい。現場の大きさにかかわらず、作業の内容に合わせて一緒に考えます。",
+  },
+  {
+    question: "導入したあとの相談もできますか？",
+    answer: "はい。使い方の説明や点検、現場が変わったときの見直しも相談できます。",
+  },
+];
+
+const images = [
+  { src: "/images/sample-1.svg", alt: "練習用の画像1" },
+  { src: "/images/sample-2.svg", alt: "練習用の画像2" },
+  { src: "/images/sample-3.svg", alt: "練習用の画像3" },
+];
 
 const steps = [
   { title: "危険を見つける", text: "現場を歩き、作業する人の話を聞いて、危ない場所と作業を書き出します。" },
@@ -14,6 +37,13 @@ const steps = [
   description="練習商事の労働安全の取り組みを紹介します。"
   current="safety"
 >
+  <nav class="breadcrumb wrap" aria-label="パンくずリスト">
+    <ol>
+      <li><a href="/">トップ</a></li>
+      <li aria-current="page">労働安全</li>
+    </ol>
+  </nav>
+
   <section class="hero">
     <div class="wrap">
       <p class="eyebrow">労働安全</p>
@@ -65,44 +95,16 @@ const steps = [
 
   <section class="section">
     <div class="wrap">
+      <h2>現場の写真</h2>
+      <p class="section-lead">画像を押すと拡大します。</p>
+      <Gallery images={images} />
+    </div>
+  </section>
+
+  <section class="section tinted">
+    <div class="wrap">
       <h2>よくある質問</h2>
-      <dl class="faq">
-        <div>
-          <dt>現場を見てもらうだけでも相談できますか？</dt>
-          <dd>はい。製品が決まっていない段階でも、現場の困りごとを聞くところから始めます。</dd>
-        </div>
-        <div>
-          <dt>小さな現場でも対応してもらえますか？</dt>
-          <dd>はい。現場の大きさにかかわらず、作業の内容に合わせて一緒に考えます。</dd>
-        </div>
-        <div>
-          <dt>導入したあとの相談もできますか？</dt>
-          <dd>はい。使い方の説明や点検、現場が変わったときの見直しも相談できます。</dd>
-        </div>
-      </dl>
+      <Faq items={faqItems} />
     </div>
   </section>
 </Base>
-
-<style>
-  .faq {
-    margin: 40px 0 0;
-    border-top: 1px solid var(--gray-200);
-  }
-
-  .faq > div {
-    padding-block: 24px;
-    border-bottom: 1px solid var(--gray-200);
-  }
-
-  .faq dt {
-    font-size: 18px;
-    font-weight: 700;
-  }
-
-  .faq dd {
-    margin: 8px 0 0;
-    color: var(--gray-700);
-    font-size: 16px;
-  }
-</style>

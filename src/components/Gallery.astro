@@ -1,0 +1,104 @@
+---
+interface Props {
+  images: { src: string; alt: string }[];
+}
+
+const { images } = Astro.props;
+---
+
+<div class="gallery" data-gallery>
+  {
+    images.map((image) => (
+      <a href={image.src} data-zoom>
+        <img src={image.src} alt={image.alt} width="1200" height="800" loading="lazy" />
+      </a>
+    ))
+  }
+</div>
+
+<dialog class="lightbox" id="lightbox" aria-label="画像の拡大表示">
+  <button type="button" class="lightbox-close" aria-label="閉じる">×</button>
+  <img alt="" />
+</dialog>
+
+<style>
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .gallery a {
+    display: block;
+    cursor: zoom-in;
+  }
+
+  .gallery img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .lightbox {
+    max-width: min(92vw, 1000px);
+    padding: 0;
+    border: 0;
+    background: var(--white);
+  }
+
+  .lightbox::backdrop {
+    background: rgb(0 0 0 / 75%);
+  }
+
+  .lightbox img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 85vh;
+    object-fit: contain;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: var(--black);
+    color: var(--white);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  @media (max-width: 720px) {
+    .gallery {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const dialog = document.getElementById("lightbox") as HTMLDialogElement | null;
+  const large = dialog?.querySelector("img");
+
+  if (dialog && large) {
+    document.querySelectorAll<HTMLAnchorElement>("[data-zoom]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        const thumbnail = link.querySelector("img");
+        large.src = link.href;
+        large.alt = thumbnail?.alt ?? "";
+        dialog.showModal();
+      });
+    });
+
+    dialog.querySelector(".lightbox-close")?.addEventListener("click", () => dialog.close());
+    // 画像の外（背景）を押しても閉じる
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+</script>

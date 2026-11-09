@@ -1,0 +1,267 @@
+---
+// 練習用の資料請求フォーム。送信先は持たず、入力内容はどこにも送らない。
+interface Props {
+  idPrefix: string;
+  docId?: string;
+  docName?: string;
+}
+
+const { idPrefix, docId = "0001", docName = "練習商事 総合カタログ（練習用）" } = Astro.props;
+const redirectUrl = `/thanks/?dl=${docId}`;
+---
+
+<form class="lead-form" data-lead-form novalidate>
+  <input type="hidden" name="redirect_url" value={redirectUrl} />
+  <input type="hidden" name="doc_name" value={`${docId}：${docName}`} />
+  <input type="hidden" name="utm_source" />
+  <input type="hidden" name="utm_medium" />
+  <input type="hidden" name="utm_campaign" />
+  <input type="hidden" name="utm_term" />
+  <input type="hidden" name="utm_content" />
+
+  <div class="field">
+    <label for={`${idPrefix}-company`}>会社名 <span aria-hidden="true">*</span></label>
+    <input id={`${idPrefix}-company`} name="company" type="text" autocomplete="organization" data-required />
+    <p class="error" hidden></p>
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for={`${idPrefix}-family`}>お名前（姓） <span aria-hidden="true">*</span></label>
+      <input id={`${idPrefix}-family`} name="family_name" type="text" autocomplete="family-name" data-required />
+      <p class="error" hidden></p>
+    </div>
+    <div class="field">
+      <label for={`${idPrefix}-given`}>お名前（名） <span aria-hidden="true">*</span></label>
+      <input id={`${idPrefix}-given`} name="given_name" type="text" autocomplete="given-name" data-required />
+      <p class="error" hidden></p>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for={`${idPrefix}-phone`}>電話番号 <span aria-hidden="true">*</span></label>
+    <input id={`${idPrefix}-phone`} name="phone" type="tel" autocomplete="tel" inputmode="tel" data-required data-format="phone" />
+    <p class="error" hidden></p>
+  </div>
+
+  <div class="field">
+    <label for={`${idPrefix}-email`}>メールアドレス <span aria-hidden="true">*</span></label>
+    <input id={`${idPrefix}-email`} name="email" type="email" autocomplete="email" data-required data-format="email" />
+    <p class="error" hidden></p>
+  </div>
+
+  <div class="field">
+    <label for={`${idPrefix}-timing`}>導入検討時期 <span aria-hidden="true">*</span></label>
+    <select id={`${idPrefix}-timing`} name="timing" data-required>
+      <option value="">選択してください</option>
+      <option>3か月以内</option>
+      <option>半年以内</option>
+      <option>1年以内</option>
+      <option>未定</option>
+    </select>
+    <p class="error" hidden></p>
+  </div>
+
+  <div class="field">
+    <label class="check">
+      <input name="agree" type="checkbox" data-required />
+      <span>プライバシーポリシーに同意して送信 <span aria-hidden="true">*</span></span>
+    </label>
+    <p class="error" hidden></p>
+  </div>
+
+  <button class="submit" type="submit">無料で資料を受け取る →</button>
+  <p class="practice-note">練習用のフォームです。入力内容はどこにも送信されません。</p>
+</form>
+
+<style>
+  .lead-form {
+    display: grid;
+    gap: 10px;
+    text-align: left;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  input:not([type="checkbox"]),
+  select {
+    width: 100%;
+    min-height: 40px;
+    padding: 6px 10px;
+    border: 1px solid var(--gray-500);
+    border-radius: 0;
+    background: var(--white);
+    color: var(--black);
+    font: inherit;
+    font-size: 16px;
+  }
+
+  input:focus-visible,
+  select:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--black);
+    outline-offset: 2px;
+  }
+
+  [aria-invalid="true"] {
+    border-width: 2px;
+    border-color: var(--black);
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .error {
+    margin-top: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .submit {
+    width: 100%;
+    min-height: 48px;
+    border: 0;
+    background: var(--black);
+    color: var(--white);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .submit:hover {
+    background: var(--gray-700);
+  }
+
+  .practice-note {
+    color: var(--gray-700);
+    font-size: 11px;
+    line-height: 1.5;
+    text-align: center;
+  }
+</style>
+
+<script>
+  const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+  const SEARCH_ENGINES = ["google.", "bing.", "yahoo.", "baidu.", "yandex.", "ask."];
+  const COOKIE_DAYS = 7;
+
+  const readCookie = (name: string) => {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : "";
+  };
+
+  const writeCookie = (name: string, value: string) => {
+    const expires = new Date(Date.now() + COOKIE_DAYS * 86400000).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+  };
+
+  // 優先順位：URLのutm_* → 7日以内に保存した値 → 参照元（外部サイト・検索エンジン）
+  const resolveTrafficSource = () => {
+    const params = new URLSearchParams(location.search);
+    if (UTM_KEYS.some((key) => params.has(key))) {
+      const values = Object.fromEntries(UTM_KEYS.map((key) => [key, params.get(key) ?? ""]));
+      Object.entries(values).forEach(([key, value]) => writeCookie(key, value));
+      return values;
+    }
+
+    const saved = Object.fromEntries(UTM_KEYS.map((key) => [key, readCookie(key)]));
+    if (saved.utm_source) return saved;
+
+    if (document.referrer) {
+      const host = new URL(document.referrer).hostname;
+      if (host !== location.hostname) {
+        const organic = SEARCH_ENGINES.some((engine) => host.includes(engine));
+        const values = { ...saved, utm_source: host, utm_medium: organic ? "organic" : "referral" };
+        writeCookie("utm_source", values.utm_source);
+        writeCookie("utm_medium", values.utm_medium);
+        return values;
+      }
+    }
+
+    return saved;
+  };
+
+  const validate = (field: HTMLInputElement | HTMLSelectElement) => {
+    if (field instanceof HTMLInputElement && field.type === "checkbox") {
+      return field.checked ? "" : "同意にチェックを入れてください。";
+    }
+
+    const value = field.value.trim();
+    if (!value) return "入力してください。";
+    if (field.dataset.format === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      return "メールアドレスの形式を確認してください。";
+    }
+    if (field.dataset.format === "phone" && !/^[0-9+()\-\s]{10,}$/.test(value)) {
+      return "電話番号の形式を確認してください。";
+    }
+    return "";
+  };
+
+  const showError = (field: HTMLInputElement | HTMLSelectElement, message: string) => {
+    const error = field.closest(".field")?.querySelector<HTMLElement>(".error");
+    if (!error) return;
+    error.textContent = message;
+    error.hidden = !message;
+    if (message) {
+      field.setAttribute("aria-invalid", "true");
+    } else {
+      field.removeAttribute("aria-invalid");
+    }
+  };
+
+  const traffic = resolveTrafficSource();
+
+  document.querySelectorAll<HTMLFormElement>("[data-lead-form]").forEach((form) => {
+    UTM_KEYS.forEach((key) => {
+      const input = form.querySelector<HTMLInputElement>(`input[name="${key}"]`);
+      if (input) input.value = traffic[key] ?? "";
+    });
+
+    const fields = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement>("[data-required]")];
+    fields.forEach((field) => {
+      field.addEventListener("change", () => showError(field, validate(field)));
+    });
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const results = fields.map((field) => {
+        const message = validate(field);
+        showError(field, message);
+        return { field, message };
+      });
+      const firstInvalid = results.find((result) => result.message);
+      if (firstInvalid) {
+        firstInvalid.field.focus();
+        return;
+      }
+
+      // 計測用に、表示中のURLへ資料番号を付けてから完了ページへ移る（個人情報はURLに入れない）
+      const redirect = new URL(form.querySelector<HTMLInputElement>('input[name="redirect_url"]')!.value, location.origin);
+      const docId = redirect.searchParams.get("dl") ?? "";
+      const params = new URLSearchParams(location.search);
+      params.set("dl[]", docId);
+      history.replaceState(history.state, "", `${location.pathname}?${params.toString()}${location.hash}`);
+      location.assign(redirect.href);
+    });
+  });
+</script>

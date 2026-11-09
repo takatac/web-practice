@@ -1,0 +1,115 @@
+---
+// 右端の追従メニュー。追従フォームと重ならないよう、フォームを閉じたあとに出す。
+---
+
+<nav class="side-menu is-hidden is-collapsed" id="side-menu" aria-label="お問い合わせメニュー">
+  <button class="toggle" type="button" aria-label="メニューを開く" aria-expanded="false">‹</button>
+  <a href="/contact/?pd=practice"><span class="icon" aria-hidden="true">?</span><span>お問い合わせ</span></a>
+  <a href="/download/?pd=practice"><span class="icon" aria-hidden="true">↓</span><span>資料ダウンロード</span></a>
+</nav>
+
+<style>
+  .side-menu {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    z-index: 9998;
+    width: 204px;
+    border: 1px solid var(--gray-500);
+    border-right: 0;
+    background: var(--white);
+    transform: translateY(-50%);
+    transition: transform 0.5s;
+  }
+
+  .side-menu.is-collapsed {
+    transform: translate(140px, -50%);
+  }
+
+  .side-menu.is-hidden {
+    display: none;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 64px;
+    padding: 10px;
+    color: var(--black);
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  a + a {
+    border-top: 1px solid var(--gray-200);
+  }
+
+  a:hover {
+    background: var(--gray-100);
+  }
+
+  .icon {
+    display: grid;
+    flex: 0 0 42px;
+    place-items: center;
+    height: 42px;
+    background: var(--black);
+    color: var(--white);
+    font-size: 20px;
+  }
+
+  .toggle {
+    position: absolute;
+    top: -29px;
+    left: -1px;
+    width: 30px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    background: var(--black);
+    color: var(--white);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .side-menu:not(.is-collapsed) .toggle {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script>
+  const menu = document.getElementById("side-menu");
+  const toggle = menu?.querySelector<HTMLButtonElement>(".toggle");
+
+  if (menu && toggle) {
+    let pinnedOpen = false;
+
+    const setCollapsed = (collapsed: boolean) => {
+      menu.classList.toggle("is-collapsed", collapsed);
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.setAttribute("aria-label", collapsed ? "メニューを開く" : "メニューを閉じる");
+    };
+
+    toggle.addEventListener("click", () => {
+      pinnedOpen = menu.classList.contains("is-collapsed");
+      setCollapsed(!pinnedOpen);
+    });
+
+    // マウスを乗せると開き、外すと畳む（クリックで開いた場合は開いたまま）
+    menu.addEventListener("mouseenter", () => setCollapsed(false));
+    menu.addEventListener("mouseleave", () => {
+      if (!pinnedOpen) setCollapsed(true);
+    });
+
+    const syncWithFollowForm = () => {
+      const form = document.getElementById("follow-form");
+      menu.classList.toggle("is-hidden", !!form && !form.classList.contains("is-closed"));
+    };
+
+    document.addEventListener("followform:change", syncWithFollowForm);
+    syncWithFollowForm();
+  }
+</script>

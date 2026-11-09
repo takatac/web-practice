@@ -1,0 +1,179 @@
+---
+interface Props {
+  slides: { title: string; text: string }[];
+}
+
+const { slides } = Astro.props;
+---
+
+<div class="slider" data-slider role="group" aria-roledescription="スライダー" aria-label="事例紹介">
+  <div class="viewport">
+    <div class="track">
+      {
+        slides.map((slide, index) => (
+          <article class="slide" aria-label={`${index + 1} / ${slides.length}`}>
+            <h3>{slide.title}</h3>
+            <p>{slide.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+  <div class="controls">
+    <button class="arrow" type="button" data-prev aria-label="前へ">←</button>
+    <div class="dots">
+      {
+        slides.map((_, index) => (
+          <button class="dot" type="button" data-dot={index} aria-label={`${index + 1}枚目へ`} />
+        ))
+      }
+    </div>
+    <button class="arrow" type="button" data-next aria-label="次へ">→</button>
+  </div>
+</div>
+
+<style>
+  .slider {
+    margin-top: 40px;
+  }
+
+  .viewport {
+    overflow: hidden;
+    background: var(--gray-100);
+    transition: height 0.3s ease;
+    touch-action: pan-y;
+  }
+
+  .track {
+    display: flex;
+    align-items: flex-start;
+    transition: transform 0.3s ease;
+  }
+
+  .slide {
+    flex: 0 0 100%;
+    padding: 40px;
+  }
+
+  .slide h3 {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+
+  .slide p {
+    max-width: 38em;
+    margin-top: 12px;
+    color: var(--gray-700);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .arrow {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--gray-500);
+    background: var(--white);
+    color: var(--black);
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .arrow:hover {
+    background: var(--gray-100);
+  }
+
+  .dots {
+    display: flex;
+    gap: 2px;
+  }
+
+  .dot {
+    position: relative;
+    width: 28px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .dot::before {
+    position: absolute;
+    top: 17px;
+    left: 9px;
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--gray-700);
+    border-radius: 50%;
+    content: "";
+  }
+
+  .dot[aria-current="true"]::before {
+    background: var(--black);
+    border-color: var(--black);
+  }
+
+  @media (max-width: 720px) {
+    .slide {
+      padding: 28px 24px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .viewport,
+    .track {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-slider]").forEach((slider) => {
+    const viewport = slider.querySelector<HTMLElement>(".viewport")!;
+    const track = slider.querySelector<HTMLElement>(".track")!;
+    const slides = [...slider.querySelectorAll<HTMLElement>(".slide")];
+    const dots = [...slider.querySelectorAll<HTMLButtonElement>(".dot")];
+    let current = 0;
+
+    const show = (index: number) => {
+      // 端まで行ったら反対の端へ回る
+      current = (index + slides.length) % slides.length;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      viewport.style.height = `${slides[current].offsetHeight}px`;
+      dots.forEach((dot, dotIndex) => {
+        if (dotIndex === current) {
+          dot.setAttribute("aria-current", "true");
+        } else {
+          dot.removeAttribute("aria-current");
+        }
+      });
+      slides.forEach((slide, slideIndex) => {
+        slide.toggleAttribute("inert", slideIndex !== current);
+      });
+    };
+
+    slider.querySelector("[data-prev]")?.addEventListener("click", () => show(current - 1));
+    slider.querySelector("[data-next]")?.addEventListener("click", () => show(current + 1));
+    dots.forEach((dot, index) => dot.addEventListener("click", () => show(index)));
+
+    let startX: number | null = null;
+    viewport.addEventListener("pointerdown", (event) => {
+      startX = event.clientX;
+    });
+    viewport.addEventListener("pointerup", (event) => {
+      if (startX === null) return;
+      const distance = event.clientX - startX;
+      startX = null;
+      if (Math.abs(distance) > 40) show(current + (distance < 0 ? 1 : -1));
+    });
+
+    window.addEventListener("resize", () => show(current));
+    show(0);
+  });
+</script>
