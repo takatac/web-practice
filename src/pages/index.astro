@@ -1,5 +1,15 @@
 ---
 import Base from "../layouts/Base.astro";
+import Slider from "../components/Slider.astro";
+
+const slides = [
+  { title: "屋根の点検（架空の例）", text: "点検の頻度が高い屋根に、作業の流れに合わせた備えを考えた例です。" },
+  {
+    title: "工場の改修（架空の例）",
+    text: "改修中は作業場所が毎週変わります。場所が変わっても使い続けられるように、持ち運べる機器を中心に組み合わせ、使い方の説明も現場ごとに行った例です。",
+  },
+  { title: "倉庫の荷役（架空の例）", text: "荷の積み下ろしで危ない場所を、担当者と一緒に書き出した例です。" },
+];
 ---
 
 <Base
@@ -36,6 +46,13 @@ import Base from "../layouts/Base.astro";
           <p>使い方の説明や点検の相談にも対応します。</p>
         </li>
       </ul>
+    </div>
+  </section>
+
+  <section class="section tinted">
+    <div class="wrap">
+      <h2>導入事例</h2>
+      <Slider slides={slides} />
     </div>
   </section>
 </Base>

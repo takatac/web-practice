@@ -1,11 +1,15 @@
 ---
+import FollowForm from "../components/FollowForm.astro";
+import SideMenu from "../components/SideMenu.astro";
+
 interface Props {
   title: string;
   description: string;
-  current: "home" | "safety";
+  current: "home" | "safety" | "none";
+  showFollowForm?: boolean;
 }
 
-const { title, description, current } = Astro.props;
+const { title, description, current, showFollowForm = true } = Astro.props;
 ---
 
 <!doctype html>
@@ -20,17 +24,50 @@ const { title, description, current } = Astro.props;
   <body>
     <header class="site-header">
       <div class="wrap header-inner">
-        <a class="logo" href="/">練習商事</a>
-        <nav aria-label="メインメニュー">
-          <a href="/" aria-current={current === "home" ? "page" : undefined}>トップ</a>
-          <a href="/safety/" aria-current={current === "safety" ? "page" : undefined}>労働安全</a>
-        </nav>
+        <div>
+          <p class="tagline">現場の安全を支える専門商社</p>
+          <a class="logo" href="/">練習商事</a>
+        </div>
+        <div class="header-actions">
+          <a class="cta cta-outline" href="/contact/?pd=practice">お問い合わせ</a>
+          <a class="cta cta-solid" href="/download/?pd=practice">資料ダウンロード</a>
+          <button
+            class="menu-button"
+            id="menu-button"
+            type="button"
+            aria-label="メニューを開く"
+            aria-expanded="false"
+            aria-controls="g-nav"
+          >
+            <span></span><span></span><span></span>
+          </button>
+        </div>
       </div>
+      <nav class="g-nav" id="g-nav" aria-label="メインメニュー">
+        <ul class="wrap">
+          <li><a href="/" aria-current={current === "home" ? "page" : undefined}>トップ</a></li>
+          <li><a href="/safety/" aria-current={current === "safety" ? "page" : undefined}>労働安全</a></li>
+          <li class="nav-mobile-only"><a href="/contact/?pd=practice">お問い合わせ</a></li>
+          <li class="nav-mobile-only"><a href="/download/?pd=practice">資料ダウンロード</a></li>
+        </ul>
+      </nav>
     </header>
 
     <main>
       <slot />
+      <section class="section tinted cv">
+        <div class="wrap">
+          <h2>まずはお気軽にお問い合わせください</h2>
+          <div class="cv-actions">
+            <a class="cta cta-outline" href="/contact/?pd=practice">お問い合わせ</a>
+            <a class="cta cta-solid" href="/download/?pd=practice">資料ダウンロード</a>
+          </div>
+        </div>
+      </section>
     </main>
+
+    {showFollowForm && <FollowForm />}
+    <SideMenu />
 
     <footer class="site-footer">
       <div class="wrap">
@@ -40,6 +77,28 @@ const { title, description, current } = Astro.props;
     </footer>
   </body>
 </html>
+
+<script>
+  const button = document.getElementById("menu-button");
+  const nav = document.getElementById("g-nav");
+
+  if (button && nav) {
+    const setOpen = (open: boolean) => {
+      nav.classList.toggle("is-open", open);
+      button.classList.toggle("is-open", open);
+      button.setAttribute("aria-expanded", String(open));
+      button.setAttribute("aria-label", open ? "メニューを閉じる" : "メニューを開く");
+    };
+
+    button.addEventListener("click", () => setOpen(!nav.classList.contains("is-open")));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && nav.classList.contains("is-open")) {
+        setOpen(false);
+        button.focus();
+      }
+    });
+  }
+</script>
 
 <style is:global>
   :root {
@@ -111,29 +170,161 @@ const { title, description, current } = Astro.props;
     text-decoration: none;
   }
 
-  nav {
+  .tagline {
+    color: var(--gray-700);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .header-actions {
     display: flex;
+    align-items: center;
     gap: 8px;
   }
 
-  nav a {
-    padding: 8px 12px;
-    color: var(--gray-700);
+  .cta {
+    display: inline-block;
+    padding: 10px 16px;
+    border: 1px solid var(--black);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .cta-solid {
+    background: var(--black);
+    color: var(--white);
+  }
+
+  .cta-solid:hover {
+    background: var(--gray-700);
+  }
+
+  .cta-outline {
+    background: var(--white);
+    color: var(--black);
+  }
+
+  .cta-outline:hover {
+    background: var(--gray-100);
+  }
+
+  .menu-button {
+    display: none;
+    position: relative;
+    z-index: 10001;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid var(--gray-500);
+    background: var(--white);
+    cursor: pointer;
+  }
+
+  .menu-button span {
+    position: absolute;
+    left: 10px;
+    width: 22px;
+    height: 2px;
+    background: var(--black);
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+
+  .menu-button span:nth-child(1) {
+    top: 13px;
+  }
+
+  .menu-button span:nth-child(2) {
+    top: 20px;
+  }
+
+  .menu-button span:nth-child(3) {
+    top: 27px;
+  }
+
+  .menu-button.is-open span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .menu-button.is-open span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-button.is-open span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .g-nav {
+    background: var(--black);
+  }
+
+  .g-nav ul {
+    display: flex;
+    margin-block: 0;
+    list-style: none;
+  }
+
+  .g-nav a {
+    display: block;
+    padding: 14px 24px;
+    color: var(--gray-200);
     font-size: 15px;
     text-decoration: none;
   }
 
-  nav a:hover {
-    color: var(--black);
-    text-decoration: underline;
-    text-underline-offset: 6px;
+  .g-nav a:hover {
+    background: var(--gray-700);
+    color: var(--white);
   }
 
-  nav a[aria-current="page"] {
+  .g-nav a[aria-current="page"] {
+    background: var(--white);
     color: var(--black);
     font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 6px;
+  }
+
+  .nav-mobile-only {
+    display: none;
+  }
+
+  .cv {
+    text-align: center;
+  }
+
+  .cv-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .cv-actions .cta {
+    min-width: 200px;
+    padding: 16px 24px;
+    font-size: 16px;
+  }
+
+  .breadcrumb {
+    padding-block: 12px;
+    color: var(--gray-700);
+    font-size: 13px;
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .breadcrumb li + li::before {
+    content: "›";
+    margin-right: 8px;
   }
 
   .hero {
@@ -269,6 +460,45 @@ const { title, description, current } = Astro.props;
   }
 
   @media (max-width: 720px) {
+    .tagline {
+      font-size: 10px;
+    }
+
+    .header-actions .cta {
+      display: none;
+    }
+
+    .menu-button {
+      display: block;
+    }
+
+    .g-nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 10000;
+      padding-block: 72px 16px;
+      visibility: hidden;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease-in-out, visibility 0.3s;
+    }
+
+    .g-nav.is-open {
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .g-nav ul {
+      display: block;
+    }
+
+    .nav-mobile-only {
+      display: block;
+    }
+
+    .menu-button.is-open {
+      border-color: var(--white);
+    }
+
     .hero {
       padding-block: 64px;
     }

@@ -1,0 +1,34 @@
+---
+import Base from "../../layouts/Base.astro";
+import LeadForm from "../../components/LeadForm.astro";
+---
+
+<Base
+  title="お問い合わせ｜練習商事"
+  description="練習商事へのお問い合わせページです（練習用）。"
+  current="none"
+  showFollowForm={false}
+>
+  <section class="section">
+    <div class="wrap narrow">
+      <h1 class="page-title">お問い合わせ</h1>
+      <p class="section-lead">現場の困りごとをお聞かせください。</p>
+      <div class="page-form"><LeadForm idPrefix="contact" docId="0002" docName="お問い合わせ（練習用）" /></div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow {
+    width: min(640px, 100%);
+  }
+
+  .page-title {
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.3;
+  }
+
+  .page-form {
+    margin-top: 32px;
+  }
+</style>

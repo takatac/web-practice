@@ -1,0 +1,133 @@
+---
+interface Props {
+  items: { question: string; answer: string }[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="faq" data-faq>
+  {
+    items.map((item, index) => (
+      <div class="faq-item">
+        <h3>
+          <button type="button" aria-expanded="false" aria-controls={`faq-panel-${index}`}>
+            <span>{item.question}</span>
+            <span class="mark" aria-hidden="true" />
+          </button>
+        </h3>
+        <div class="panel" id={`faq-panel-${index}`}>
+          <div class="panel-inner">
+            <p>{item.answer}</p>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .faq {
+    margin-top: 40px;
+    border-top: 1px solid var(--gray-200);
+  }
+
+  .faq-item {
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  h3 {
+    margin: 0;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding: 20px 4px;
+    border: 0;
+    background: none;
+    color: var(--black);
+    font: inherit;
+    font-size: 17px;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: var(--gray-100);
+  }
+
+  .mark {
+    position: relative;
+    flex: 0 0 16px;
+    height: 16px;
+  }
+
+  .mark::before,
+  .mark::after {
+    position: absolute;
+    top: 7px;
+    left: 0;
+    width: 16px;
+    height: 2px;
+    background: var(--black);
+    content: "";
+    transition: transform 0.3s;
+  }
+
+  .mark::after {
+    transform: rotate(90deg);
+  }
+
+  button[aria-expanded="true"] .mark::after {
+    transform: rotate(0);
+  }
+
+  .panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition: grid-template-rows 0.3s ease, visibility 0.3s;
+  }
+
+  .faq-item.is-open .panel {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+
+  .panel-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .panel,
+    .mark::before,
+    .mark::after {
+      transition: none;
+    }
+  }
+
+  .panel p {
+    padding: 0 4px 20px;
+    color: var(--gray-700);
+    font-size: 16px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-faq] .faq-item").forEach((item) => {
+    const button = item.querySelector<HTMLButtonElement>("button");
+    if (!button) return;
+
+    button.addEventListener("click", () => {
+      const opening = !item.classList.contains("is-open");
+      item.classList.toggle("is-open", opening);
+      button.setAttribute("aria-expanded", String(opening));
+    });
+  });
+</script>

@@ -1,0 +1,34 @@
+---
+import Base from "../../layouts/Base.astro";
+import LeadForm from "../../components/LeadForm.astro";
+---
+
+<Base
+  title="資料ダウンロード｜練習商事"
+  description="練習商事の資料ダウンロードページです（練習用）。"
+  current="none"
+  showFollowForm={false}
+>
+  <section class="section">
+    <div class="wrap narrow">
+      <h1 class="page-title">資料ダウンロード</h1>
+      <p class="section-lead">現場に合う安全対策が、1冊でわかる資料です。</p>
+      <div class="page-form"><LeadForm idPrefix="download" /></div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .narrow {
+    width: min(640px, 100%);
+  }
+
+  .page-title {
+    font-size: clamp(28px, 5vw, 40px);
+    line-height: 1.3;
+  }
+
+  .page-form {
+    margin-top: 32px;
+  }
+</style>
